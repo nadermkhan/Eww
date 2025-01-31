@@ -2,7 +2,7 @@ package nader.eww.api;
 
 import nader.eww.model.Message;
 import nader.eww.model.User;
-
+import nader.eww.model.ReactionRequest;
 import java.util.List;
 
 import retrofit2.Call;
