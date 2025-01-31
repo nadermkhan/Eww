@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import nader.eww.api.ChatApiService;
+import nader.eww.api.*;
 import nader.eww.db.ChatDatabase;
 import nader.eww.model.Message;
 import nader.eww.model.ReactionRequest;
