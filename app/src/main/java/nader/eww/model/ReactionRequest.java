@@ -10,10 +10,17 @@ public class ReactionRequest {
     public ReactionRequest() {}
 
     // Parameterized constructor
-    public ReactionRequest(String anonymousId, long messageId, String reaction,String reason=null) {
+    public ReactionRequest(String anonymousId, long messageId, String reaction) {
         this.anonymousId = anonymousId;
         this.messageId = messageId;
         this.reaction = reaction;
-        this.reason=reason;
+        this.reason=null;
+    }
+    // Constructor with reason
+    public ReactionRequest(String anonymousId, long messageId, String reaction, String reason) {
+        this.anonymousId = anonymousId;
+        this.messageId = messageId;
+        this.reaction = reaction;
+        this.reason = reason;
     }
 }
