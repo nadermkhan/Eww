@@ -1,4 +1,4 @@
-package nader.eww.model;
+package nader.eww.model:
 
 public class ReactionRequest {
     public String anonymousId;
