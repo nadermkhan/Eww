@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.fullyanonymouschat.adapter.MessageAdapter;
-import com.example.fullyanonymouschat.databinding.ActivityMainBinding;
-import com.example.fullyanonymouschat.model.Message;
-import com.example.fullyanonymouschat.viewmodel.ChatViewModel;
+import nader.eww.adapter.MessageAdapter;
+import nader.eww.databinding.ActivityMainBinding;
+import nader.eww.model.Message;
+import nader.eww.viewmodel.ChatViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,4 +56,3 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 }
-

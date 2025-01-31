@@ -10,7 +10,7 @@ import androidx.room.TypeConverters;
 import nader.eww.model.Message;
 import nader.eww.model.User;
 
-@Database(entities = {User.class, Message.class}, version = 1)
+@Database(entities = {User.class, Message.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class ChatDatabase extends RoomDatabase {
 	public abstract UserDao userDao();
