@@ -16,12 +16,48 @@ import retrofit2.Response;
 
 public class ChatRepository {
 
+    private static final String PREF_NAME = "ChatPrefs";
+    private static final String KEY_ANONYMOUS_ID = "anonymous_id";
+
+    private Context context;
     private ChatDatabase database;
     private ChatApiService apiService;
+    private SharedPreferences prefs;
 
-    public ChatRepository(ChatDatabase database, ChatApiService apiService) {
+    public ChatRepository(Context context, ChatDatabase database, ChatApiService apiService) {
+        this.context = context;
         this.database = database;
         this.apiService = apiService;
+        this.prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    public String getAnonymousId() {
+        return prefs.getString(KEY_ANONYMOUS_ID, null);
+    }
+
+    private void saveAnonymousId(String anonymousId) {
+        prefs.edit().putString(KEY_ANONYMOUS_ID, anonymousId).apply();
+    }
+
+    public void createUser(ApiCallback<User> callback) {
+        apiService.createUser().enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    saveAnonymousId(user.anonymousId);
+                    new Thread(() -> database.userDao().insert(user)).start();
+                    callback.onSuccess(user);
+                } else {
+                    callback.onError("Failed to create user");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
     }
 
     public LiveData<List<Message>> getAllMessages() {
@@ -46,6 +82,12 @@ public class ChatRepository {
     }
 
     public void sendMessage(Message message, ApiCallback<Message> callback) {
+        String anonymousId = getAnonymousId();
+        if (anonymousId == null) {
+            callback.onError("User not created. Please create a user first.");
+            return;
+        }
+        message.anonymousId = anonymousId;
         apiService.createMessage(message).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {

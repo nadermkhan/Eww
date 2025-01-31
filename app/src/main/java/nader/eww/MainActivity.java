@@ -34,6 +34,20 @@ public class MainActivity extends AppCompatActivity {
             adapter.submitList(messages);
         });
 
+        viewModel.isUserCreated().observe(this, isCreated -> {
+            binding.sendButton.setEnabled(isCreated);
+            binding.messageInput.setEnabled(isCreated);
+            if (!isCreated) {
+                binding.createUserButton.setVisibility(View.VISIBLE);
+            } else {
+                binding.createUserButton.setVisibility(View.GONE);
+            }
+        });
+
+        binding.createUserButton.setOnClickListener(v -> {
+            viewModel.createUser();
+        });
+
         binding.sendButton.setOnClickListener(v -> {
             String content = binding.messageInput.getText().toString().trim();
             if (!content.isEmpty()) {

@@ -1,6 +1,7 @@
 package nader.eww.viewmodel;
 
 import android.app.Application;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -15,21 +16,45 @@ import nader.eww.model.User;
 import nader.eww.repository.ChatRepository;
 
 import java.util.List;
-import android.widget.Toast;
-import java.util.List;
 
 public class ChatViewModel extends AndroidViewModel {
 
     private ChatRepository repository;
     private LiveData<List<Message>> messages;
     private MutableLiveData<String> error = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isUserCreated = new MutableLiveData<>(false);
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
         ChatDatabase database = ChatDatabase.getDatabase(application);
         ChatApiService apiService = RetrofitClient.getClient().create(ChatApiService.class);
-        repository = new ChatRepository(database, apiService);
+        repository = new ChatRepository(application, database, apiService);
         messages = repository.getAllMessages();
+        checkUserCreated();
+    }
+
+    private void checkUserCreated() {
+        String anonymousId = repository.getAnonymousId();
+        isUserCreated.setValue(anonymousId != null);
+    }
+
+    public LiveData<Boolean> isUserCreated() {
+        return isUserCreated;
+    }
+
+    public void createUser() {
+        repository.createUser(new ChatRepository.ApiCallback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                isUserCreated.postValue(true);
+                showToast("User created successfully!");
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                error.postValue(errorMessage);
+            }
+        });
     }
 
     public LiveData<List<Message>> getMessages() {
@@ -44,7 +69,7 @@ public class ChatViewModel extends AndroidViewModel {
         repository.sendMessage(message, new ChatRepository.ApiCallback<Message>() {
             @Override
             public void onSuccess(Message result) {
-                showToast("Message sent successfully");
+                showToast("Message sent successfully!");
             }
 
             @Override
@@ -58,7 +83,7 @@ public class ChatViewModel extends AndroidViewModel {
         repository.markMessageAsSeen(messageId, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Message marked as seen");
+                showToast("Message marked as seen!");
             }
 
             @Override
@@ -77,7 +102,26 @@ public class ChatViewModel extends AndroidViewModel {
         repository.reactToMessage(request, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Reaction sent successfully");
+                showToast("Reaction sent successfully!");
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                error.postValue(errorMessage);
+            }
+        });
+    }
+
+    public void reportMessage(String anonymousId, long messageId, String reason) {
+        ReactionRequest request = new ReactionRequest();
+        request.anonymousId = anonymousId;
+        request.messageId = messageId;
+        request.reason = reason;
+
+        repository.reportMessage(request, new ChatRepository.ApiCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                showToast("Message reported successfully!");
             }
 
             @Override
@@ -91,7 +135,7 @@ public class ChatViewModel extends AndroidViewModel {
         repository.updateUserProfile(user, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Profile updated successfully");
+                showToast("Profile updated successfully!");
             }
 
             @Override
