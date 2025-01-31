@@ -1,4 +1,4 @@
-package nader.eww.model.adapter;
+package nader.eww.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
