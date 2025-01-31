@@ -11,7 +11,7 @@ import nader.eww.adapter.MessageAdapter;
 import nader.eww.databinding.ActivityMainBinding;
 import nader.eww.model.Message;
 import nader.eww.viewmodel.ChatViewModel;
-
+import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
