@@ -13,6 +13,7 @@ import retrofit2.Response;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
 public class ChatRepository {
 
     private static final String PREF_NAME = "ChatPrefs";

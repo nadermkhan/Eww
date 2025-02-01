@@ -10,6 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import com.google.gson.annotations.SerializedName;
+
 public interface ChatApiService {
     @POST("/api/user")
     Call<CreateUserResponse> createUser();
@@ -35,8 +36,9 @@ public interface ChatApiService {
     @GET("/api/message/{id}/seen")
     Call<Void> markMessageAsSeen(@Path("id") long messageId);
 
-    class CreateUserResponse {
+    public static class CreateUserResponse {
         @SerializedName("anonymous_id")
-        String anonymousId;
+        public String anonymousId;
     }
 }
+
