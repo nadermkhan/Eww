@@ -12,7 +12,7 @@ import retrofit2.http.Path;
 
 public interface ChatApiService {
     @POST("/api/user")
-    Call<User> createUser();
+    Call<CreateUserResponse> createUser();
 
     @POST("/api/user/update")
     Call<Void> updateUserProfile(@Body User user);
@@ -34,5 +34,9 @@ public interface ChatApiService {
 
     @GET("/api/message/{id}/seen")
     Call<Void> markMessageAsSeen(@Path("id") long messageId);
-}
 
+    class CreateUserResponse {
+        @SerializedName("anonymous_id")
+        String anonymousId;
+    }
+}

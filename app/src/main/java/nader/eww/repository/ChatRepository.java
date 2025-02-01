@@ -13,6 +13,7 @@ import retrofit2.Response;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
 public class ChatRepository {
 
     private static final String PREF_NAME = "ChatPrefs";
@@ -43,11 +44,13 @@ public class ChatRepository {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    User user = response.body();
-                    if (user.anonymousId != null && !user.anonymousId.isEmpty()) {
-                        saveAnonymousId(user.anonymousId);
+                    String anonymousId = response.body().anonymousId;
+                    if (anonymousId != null && !anonymousId.isEmpty()) {
+                        saveAnonymousId(anonymousId);
+                        User user = new User();
+                        user.anonymousId = anonymousId;
                         new Thread(() -> database.userDao().insert(user)).start();
-                        Log.d("ChatRepository", "Received anonymousId: " + user.anonymousId);
+                        Log.d("ChatRepository", "Received anonymousId: " + anonymousId);
                         callback.onSuccess(user);
                     } else {
                         Log.e("ChatRepository", "Error: Anonymous ID is null or empty");
