@@ -14,7 +14,6 @@ import nader.eww.model.ReactionRequest;
 import nader.eww.model.User;
 import nader.eww.repository.ChatRepository;
 import java.util.List;
-
 public class ChatViewModel extends AndroidViewModel {
 
     private ChatRepository repository;
@@ -116,10 +115,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     public void reportMessage(String anonymousId, long messageId, String reason) {
         Log.d("ChatViewModel", "Reporting message: " + messageId + " with reason: " + reason);
-        ReactionRequest request = new ReactionRequest();
-        request.anonymousId = anonymousId;
-        request.messageId = messageId;
-        request.reason = reason;
+        ReactionRequest request = new ReactionRequest(anonymousId, messageId, "report", reason);
 
         repository.reportMessage(request, new ChatRepository.ApiCallback<Void>() {
             @Override

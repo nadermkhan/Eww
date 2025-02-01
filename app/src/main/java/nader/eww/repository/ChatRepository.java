@@ -71,6 +71,10 @@ public class ChatRepository {
         return database.messageDao().getAllMessages();
     }
 
+    public LiveData<User> getUser() {
+        return database.userDao().getUser();
+    }
+
     private void refreshMessages() {
         apiService.getMessages().enqueue(new Callback<List<Message>>() {
             @Override
@@ -151,8 +155,7 @@ public class ChatRepository {
         });
     }
 
-    public void reportMessage(String anonymousId, long messageId, String reason, ApiCallback<Void> callback) {
-        ReactionRequest request = new ReactionRequest(anonymousId, messageId, "report", reason);
+    public void reportMessage(ReactionRequest request, ApiCallback<Void> callback) {
         apiService.reportMessage(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
