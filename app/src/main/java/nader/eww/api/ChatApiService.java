@@ -9,7 +9,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
-
+import com.google.gson.annotations.SerializedName;
 public interface ChatApiService {
     @POST("/api/user")
     Call<CreateUserResponse> createUser();
