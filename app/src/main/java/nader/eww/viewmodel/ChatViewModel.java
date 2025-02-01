@@ -1,4 +1,4 @@
-package nader.eww.repository;
+package nader.eww.viewmodel;
 
 import android.app.Application;
 import android.util.Log;
