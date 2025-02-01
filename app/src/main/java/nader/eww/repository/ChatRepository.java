@@ -1,22 +1,17 @@
 package nader.eww.repository;
 
 import androidx.lifecycle.LiveData;
-
 import nader.eww.api.ChatApiService;
 import nader.eww.db.ChatDatabase;
 import nader.eww.model.Message;
 import nader.eww.model.ReactionRequest;
 import nader.eww.model.User;
-
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import android.content.Context;
 import android.content.SharedPreferences;
-
-
 public class ChatRepository {
 
     private static final String PREF_NAME = "ChatPrefs";
@@ -48,16 +43,24 @@ public class ChatRepository {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    saveAnonymousId(user.anonymousId);
-                    new Thread(() -> database.userDao().insert(user)).start();
-                    callback.onSuccess(user);
+                    if (user.anonymousId != null && !user.anonymousId.isEmpty()) {
+                        saveAnonymousId(user.anonymousId);
+                        new Thread(() -> database.userDao().insert(user)).start();
+                        Log.d("ChatRepository", "Received anonymousId: " + user.anonymousId);
+                        callback.onSuccess(user);
+                    } else {
+                        Log.e("ChatRepository", "Error: Anonymous ID is null or empty");
+                        callback.onError("Invalid anonymous ID received");
+                    }
                 } else {
+                    Log.e("ChatRepository", "Error: API response unsuccessful");
                     callback.onError("Failed to create user");
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                Log.e("ChatRepository", "API Call Failed: " + t.getMessage());
                 callback.onError(t.getMessage());
             }
         });
@@ -91,6 +94,7 @@ public class ChatRepository {
             return;
         }
         message.anonymousId = anonymousId;
+        Log.d("ChatRepository", "Sending message: " + message.content);
         apiService.createMessage(message).enqueue(new Callback<Message>() {
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
@@ -110,6 +114,7 @@ public class ChatRepository {
     }
 
     public void markMessageAsSeen(long messageId, ApiCallback<Void> callback) {
+        Log.d("ChatRepository", "Marking message as seen: " + messageId);
         apiService.markMessageAsSeen(messageId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -128,6 +133,7 @@ public class ChatRepository {
     }
 
     public void reactToMessage(ReactionRequest request, ApiCallback<Void> callback) {
+        Log.d("ChatRepository", "Reacting to message: " + request.messageId + " with reaction: " + request.reaction);
         apiService.reactToMessage(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -145,7 +151,8 @@ public class ChatRepository {
         });
     }
 
-    public void reportMessage(ReactionRequest request, ApiCallback<Void> callback) {
+    public void reportMessage(String anonymousId, long messageId, String reason, ApiCallback<Void> callback) {
+        ReactionRequest request = new ReactionRequest(anonymousId, messageId, "report", reason);
         apiService.reportMessage(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -164,6 +171,7 @@ public class ChatRepository {
     }
 
     public void updateUserProfile(User user, ApiCallback<Void> callback) {
+        Log.d("ChatRepository", "Updating user profile for: " + user.anonymousId);
         apiService.updateUserProfile(user).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

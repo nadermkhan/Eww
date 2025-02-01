@@ -1,21 +1,18 @@
-package nader.eww.viewmodel;
+package nader.eww.repository;
 
 import android.app.Application;
-import android.widget.Toast;
-
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
-import nader.eww.api.*;
+import nader.eww.api.ChatApiService;
+import nader.eww.api.RetrofitClient;
 import nader.eww.db.ChatDatabase;
 import nader.eww.model.Message;
 import nader.eww.model.ReactionRequest;
 import nader.eww.model.User;
 import nader.eww.repository.ChatRepository;
-
-
 import java.util.List;
 
 public class ChatViewModel extends AndroidViewModel {
@@ -35,8 +32,9 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     private void checkUserCreated() {
-        String anonymousId = repository.getAnonymousId();
-        isUserCreated.setValue(anonymousId != null);
+        repository.getUser().observeForever(user -> {
+            isUserCreated.setValue(user != null);
+        });
     }
 
     public LiveData<Boolean> isUserCreated() {
@@ -44,11 +42,11 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void createUser() {
+        Log.d("ChatViewModel", "Creating user");
         repository.createUser(new ChatRepository.ApiCallback<User>() {
             @Override
             public void onSuccess(User result) {
                 isUserCreated.postValue(true);
-                showToast("User created successfully!");
             }
 
             @Override
@@ -67,10 +65,11 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void sendMessage(Message message) {
+        Log.d("ChatViewModel", "Sending message: " + message.content);
         repository.sendMessage(message, new ChatRepository.ApiCallback<Message>() {
             @Override
             public void onSuccess(Message result) {
-                showToast("Message sent successfully!");
+                // Message sent successfully
             }
 
             @Override
@@ -81,10 +80,11 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void markMessageAsSeen(long messageId) {
+        Log.d("ChatViewModel", "Marking message as seen: " + messageId);
         repository.markMessageAsSeen(messageId, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Message marked as seen!");
+                // Message marked as seen
             }
 
             @Override
@@ -95,6 +95,7 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void reactToMessage(String anonymousId, long messageId, String reaction) {
+        Log.d("ChatViewModel", "Reacting to message: " + messageId + " with reaction: " + reaction);
         ReactionRequest request = new ReactionRequest();
         request.anonymousId = anonymousId;
         request.messageId = messageId;
@@ -103,7 +104,7 @@ public class ChatViewModel extends AndroidViewModel {
         repository.reactToMessage(request, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Reaction sent successfully!");
+                // Reaction sent successfully
             }
 
             @Override
@@ -114,6 +115,7 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void reportMessage(String anonymousId, long messageId, String reason) {
+        Log.d("ChatViewModel", "Reporting message: " + messageId + " with reason: " + reason);
         ReactionRequest request = new ReactionRequest();
         request.anonymousId = anonymousId;
         request.messageId = messageId;
@@ -122,7 +124,7 @@ public class ChatViewModel extends AndroidViewModel {
         repository.reportMessage(request, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Message reported successfully!");
+                // Message reported successfully
             }
 
             @Override
@@ -133,10 +135,11 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public void updateUserProfile(User user) {
+        Log.d("ChatViewModel", "Updating user profile");
         repository.updateUserProfile(user, new ChatRepository.ApiCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
-                showToast("Profile updated successfully!");
+                // Profile updated successfully
             }
 
             @Override
@@ -146,7 +149,7 @@ public class ChatViewModel extends AndroidViewModel {
         });
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show();
+    public LiveData<User> getUser() {
+        return repository.getUser();
     }
 }
