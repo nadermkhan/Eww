@@ -13,7 +13,6 @@ import retrofit2.Response;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 public class ChatRepository {
 
     private static final String PREF_NAME = "ChatPrefs";
@@ -40,9 +39,9 @@ public class ChatRepository {
     }
 
     public void createUser(ApiCallback<User> callback) {
-        apiService.createUser().enqueue(new Callback<User>() {
+        apiService.createUser().enqueue(new Callback<ChatApiService.CreateUserResponse>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<ChatApiService.CreateUserResponse> call, Response<ChatApiService.CreateUserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String anonymousId = response.body().anonymousId;
                     if (anonymousId != null && !anonymousId.isEmpty()) {
@@ -63,7 +62,7 @@ public class ChatRepository {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<ChatApiService.CreateUserResponse> call, Throwable t) {
                 Log.e("ChatRepository", "API Call Failed: " + t.getMessage());
                 callback.onError(t.getMessage());
             }
